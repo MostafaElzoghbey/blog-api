@@ -12,7 +12,7 @@ Route::prefix('api')->group(function () {
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('logout', [AuthController::class, 'logout']);
 
         // Post routes
         Route::get('posts', [PostController::class, 'index']);

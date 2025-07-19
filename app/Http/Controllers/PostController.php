@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -18,10 +19,19 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'body' => 'required|string',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $post = Post::create([
             'title' => $request->title,
@@ -45,14 +55,22 @@ class PostController extends Controller
         // Check if user owns the post
         if ($post->user_id !== $request->user()->id) {
             return response()->json([
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized to update this post'
             ], 403);
         }
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'body' => 'required|string',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $post->update([
             'title' => $request->title,
@@ -69,7 +87,7 @@ class PostController extends Controller
         // Check if user owns the post
         if ($post->user_id !== $request->user()->id) {
             return response()->json([
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized to delete this post'
             ], 403);
         }
 
